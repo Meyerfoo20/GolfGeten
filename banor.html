@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Golfbanor</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<style>
+
+.navbar {
+    background-color: rgb(220, 255, 106) !important;
+    color: #222 !important;
+}
+
+.navbar a {
+    color: #222 !important;
+    text-decoration: none;
+    font-size: larger;
+    font-weight: 600;
+    margin: 0px 10px;
+}
+
+.navbar-brand img {
+    width: 50px;
+    height: 85px;
+}
+
+.card {
+    border-radius: 20px;
+    background-color: rgb(220, 255, 106);
+    border: none;
+}
+
+.card-img-top {
+    height: 250px;
+    border-radius: 20px 20px 0px 0px;
+}
+
+.jumbotron {
+    background: url('jumbotron.jpg');
+    height: 500px;
+    border-radius: 0px;
+}
+
+.jumbotron h1 {
+    font-size: 78px;
+    font-weight: bolder;
+    color: #fff !important;
+    margin: 120px 0px !important;
+}
+
+.navbar-toggler {
+  background-color: #222;
+  color: rgb(220, 255, 106);
+}
+
+</style>
+
+</head>
+<body>
+
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <!-- Logo -->
+    <a class="navbar-brand" href="#">
+        <img src="logo.png" alt="Logo" style="width: 100px;"> <!-- Anpassa sökvägen och bredden efter behov -->
+    </a>
+    
+    <!-- Toggler/collapsible Button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+        <li class="nav-item">
+            <a class="nav-link" href="index.html">Start</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="banor.html">Golfbanor</a>
+        </li>
+        </ul>
+    </div>
+    </nav>
+
+<div class="jumbotron text-center">
+    <h1>Golfbanor</h1>
+</div>
+
+<div class="container mt-5">
+  <h2 class="text-center mb-4" style="margin: 60px 0px !important;">Alla Golfbanor:</h2>
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <a href="TC.html" class="text-decoration-none text-dark">
+        <div class="card">
+          <img src="golfbanor/tc.jpg" class="card-img-top" alt="Golfbana 1">
+          <div class="card-body">
+            <h5 class="card-title">Tournament Course</h5>
+            <p class="card-text">Vasatorp, 18 hål.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4 mb-4">
+      <a href="https://www.exempel.com/golfbana2" class="text-decoration-none text-dark">
+        <div class="card">
+          <img src="golfbanor/cc.jpg" class="card-img-top" alt="Golfbana 2">
+          <div class="card-body">
+            <h5 class="card-title">Classic Course</h5>
+            <p class="card-text">Vasatorp, 18 hål.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-4 mb-4">
+      <a href="https://www.exempel.com/golfbana3" class="text-decoration-none text-dark">
+        <div class="card">
+          <img src="golfbanor/pc.jpg" class="card-img-top" alt="Golfbana 3">
+          <div class="card-body">
+            <h5 class="card-title">Park Course</h5>
+            <p class="card-text">Vasatorp, 12 hål.</p>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

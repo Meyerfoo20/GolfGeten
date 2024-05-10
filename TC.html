@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Golfscorekort</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* Anpassad CSS */
+    body {
+      color: black; /* Ange textfärg till #dcff6a */
+    }
+    .hole-card {
+      margin-bottom: 20px;
+      background-color: #dcff6a; /* Ange hålkorts bakgrundsfärg till #1b1b1b */
+      border-color: #dcff6a; /* Ange kantfärg till #dcff6a */
+      color: black;
+    }
+    .card-header {
+      background-color: black; /* Ange kortets sidhuvuds bakgrundsfärg till #1b1b1b */
+      color: #dcff6a;
+      position: relative; /* Add position relative to align the info icon */
+    }
+    .card-footer {
+      background-color: black; /* Ange kortets sidfots bakgrundsfärg till #1b1b1b */
+      color: #dcff6a;
+    }
+    .btn-primary {
+      background-color: #dcff6a; /* Ange knappens bakgrundsfärg till #dcff6a */
+      border-color: #dcff6a; /* Ange knappens kantfärg till #dcff6a */
+    }
+    .btn-primary:hover {
+      background-color: #9cbf00; /* Ange knappens bakgrundsfärg vid hovring till en mörkare nyans */
+      border-color: #9cbf00; /* Ange knappens kantfärg vid hovring till en mörkare nyans */
+    }
+    .form-control {
+      background-color: #1b1b1b; /* Ange inmatnings bakgrundsfärg till #1b1b1b */
+      border-color: #dcff6a; /* Ange inmatnings kantfärg till #dcff6a */
+      color: #dcff6a; /* Ange inmatnings textfärg till #dcff6a */
+    }
+    .info-icon {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .table {
+      background-color: #dcff6a;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="text-center my-4">Tournament Course</h1>
+
+    <form>
+      <div class="form-group">
+        <label for="handicap">Skriv in ditt handicap:</label>
+        <input type="text" class="form-control" id="handicap" placeholder="Ange ditt handicap...">
+      </div>
+    </form>
+    
+    <div class="row">
+      <div class="col-12">
+        <!-- Hål 1 -->
+<div id="hole1" class="card hole-card">
+  <div class="card-header">
+    Hål 1
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole1-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 10</p>
+    <p>Par: 4</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>272</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>327</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>365</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>379</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>407</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole1-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole1-score" data-par="4">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(1)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(1)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 2 -->
+<div id="hole2" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 2
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole2-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 12</p>
+    <p>Par: 3</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>85</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>108</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>129</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>156</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>178</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole2-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole2-score" data-par="3">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(2)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(2)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 3 -->
+<div id="hole3" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 3
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole3-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 4</p>
+    <p>Par: 5</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>426</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>426</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>454</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>486</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>512</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole3-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole3-score" data-par="5">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(3)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(3)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 4 -->
+<div id="hole4" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 4
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole4-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 18</p>
+    <p>Par: 3</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>116</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>131</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>163</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>168</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>197</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole4-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole4-score" data-par="3">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(4)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(4)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 5 -->
+<div id="hole5" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 5
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole5-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 2</p>
+    <p>Par: 4</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>242</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>257</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>301</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>301</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>345</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole5-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole5-score" data-par="4">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(5)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(5)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 6 -->
+<div id="hole6" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 6
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole6-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 16</p>
+    <p>Par: 5</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>349</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>368</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>406</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>443</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>443</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole6-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole6-score" data-par="5">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(6)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(6)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 7 -->
+<div id="hole7" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 7
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole7-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 8</p>
+    <p>Par: 4</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>262</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>288</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>321</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>356</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>356</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole7-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole7-score" data-par="4">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(7)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(7)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 8 -->
+<div id="hole8" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 8
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole8-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 14</p>
+    <p>Par: 4</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>205</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>235</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>235</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>271</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>298</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole8-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole8-score" data-par="4">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(8)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(8)">Tillbaka</button>
+  </div>
+</div>
+
+<!-- Hål 9 -->
+<div id="hole9" class="card hole-card" style="display: none;">
+  <div class="card-header">
+    Hål 9
+    <img src="info-icon.png" class="info-icon" onclick="toggleImage('hole9-image')">
+  </div>
+  <div class="card-body">
+    <p>Index: 6</p>
+    <p>Par: 4</p>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Tee</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>47</td>
+          <td>275</td>
+        </tr>
+        <tr>
+          <td>51</td>
+          <td>312</td>
+        </tr>
+        <tr>
+          <td>57</td>
+          <td>345</td>
+        </tr>
+        <tr>
+          <td>60</td>
+          <td>378</td>
+        </tr>
+        <tr>
+          <td>63</td>
+          <td>378</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-group">
+      <label for="hole9-score">Antal slag:</label>
+      <input type="number" class="form-control" id="hole9-score" data-par="4">
+    </div>
+  </div>
+  <div style="margin-bottom: 40px;">
+    <button type="button" class="btn btn-primary float-right" onclick="nextHole(9)">Nästa</button>
+    <button type="button" class="btn btn-primary float-left" onclick="prevHole(9)">Tillbaka</button>
+  </div>
+</div>
+
+
+        <!-- Add more holes here -->
+
+        <!-- Images -->
+        <div id="hole1-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål1.png" alt="Hole 1 Image">
+        </div>
+        <div id="hole2-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål2.png" alt="Hole 2 Image">
+        </div>
+        <div id="hole3-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål3.png" alt="Hole 3 Image">
+        </div>
+        <div id="hole4-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål4.png" alt="Hole 4 Image">
+        </div>
+        <div id="hole5-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål5.png" alt="Hole 5 Image">
+        </div>
+        <div id="hole6-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål6.png" alt="Hole 6 Image">
+        </div>
+        <div id="hole7-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål7.png" alt="Hole 7 Image">
+        </div>
+        <div id="hole8-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål8.png" alt="Hole 8 Image">
+        </div>
+        <div id="hole9-image" class="card hole-card" style="display: none;">
+          <img src="TC-Bilder/hål9.png" alt="Hole 9 Image">
+        </div>        
+
+        <!-- Totalt antal slag/resultat och över/under par -->
+        <div class="card" style="margin-top: 100px;">
+          <div class="card-header">
+            Total runda info:
+          </div>
+          <div class="card-body">
+            <p>Totalt antal slag: <span id="total-shots">0</span></p>
+            <p>Par: <span id="over-under-par">0</span></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<center>
+  <!-- Slagtabel sektion -->
+<div class="row mt-5" style="margin-top: 20px; width: 75%; text-align: left;">
+  <div class="col-12">
+    <h2>Slagtabel</h2>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Hål</th>
+          <th>Slag</th>
+        </tr>
+      </thead>
+      <tbody id="scoreTableBody">
+        <!-- Tabellrader kommer att fyllas in här via JavaScript -->
+      </tbody>
+    </table>
+  </div>
+</center>
+<!-- Bootstrap JS och jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+  // JavaScript-funktioner för navigering mellan hål
+  function nextHole(currentHole) {
+    var nextHole = currentHole + 1;
+    var nextHoleElement = document.getElementById('hole' + nextHole);
+    if (nextHoleElement) {
+      document.getElementById('hole' + currentHole).style.display = 'none';
+      nextHoleElement.style.display = 'block';
+    }
+  }
+
+  function prevHole(currentHole) {
+    var prevHole = currentHole - 1;
+    var prevHoleElement = document.getElementById('hole' + prevHole);
+    if (prevHoleElement) {
+      document.getElementById('hole' + currentHole).style.display = 'none';
+      prevHoleElement.style.display = 'block';
+    }
+  }
+
+  // JavaScript-funktion för att byta mellan hål och bildvisning
+  function toggleImage(elementId) {
+    var element = document.getElementById(elementId);
+    if (element.style.display === 'none') {
+      element.style.display = 'block';
+    } else {
+      element.style.display = 'none';
+    }
+  }
+
+  // JavaScript-funktion för att beräkna och uppdatera totalt antal slag och över/under par
+  function updateScorecard() {
+    var totalShots = 0;
+    var totalPar = 0;
+
+    // Beräkna totalt antal slag och totalt par för registrerade hål
+    for (var i = 1; i <= 9; i++) {
+      var holeScoreInput = document.getElementById('hole' + i + '-score');
+      if (holeScoreInput.value !== '') {
+        totalShots += parseInt(holeScoreInput.value);
+        totalPar += parseInt(holeScoreInput.getAttribute('data-par'));
+      }
+    }
+
+    // Uppdatera visning för totalt antal slag
+    document.getElementById('total-shots').textContent = totalShots;
+
+    // Beräkna över/under par
+    var overUnderPar = totalShots - totalPar;
+    
+    // Uppdatera visning för över/under par med tecken (+ eller -) beroende på om spelaren är över eller under par
+    var overUnderParDisplay = overUnderPar >= 0 ? "+" + overUnderPar : overUnderPar;
+
+    // Uppdatera visning för över/under par
+    document.getElementById('over-under-par').textContent = overUnderParDisplay;
+  }
+
+  // JavaScript-funktion för att uppdatera slagtabel
+  function updateScoreTable() {
+    var scoreTableBody = document.getElementById('scoreTableBody');
+    scoreTableBody.innerHTML = ''; // Rensa innehållet för att undvika dubbletter
+
+    // Loopa genom alla hål och lägg till en rad i tabellen för varje hål
+    for (var i = 1; i <= 9; i++) {
+      var holeScoreInput = document.getElementById('hole' + i + '-score');
+      var holePar = holeScoreInput.getAttribute('data-par');
+      var holeScore = holeScoreInput.value !== '' ? parseInt(holeScoreInput.value) : 0;
+
+      // Skapa en ny tabellrad
+      var row = document.createElement('tr');
+
+      // Skapa celler för hålnummer och slag
+      var holeCell = document.createElement('td');
+      holeCell.textContent = 'Hål ' + i;
+      var scoreCell = document.createElement('td');
+      scoreCell.textContent = holeScore + ' (' + holePar + ')';
+
+      // Lägg till cellerna i raden
+      row.appendChild(holeCell);
+      row.appendChild(scoreCell);
+
+      // Lägg till raden i tabellen
+      scoreTableBody.appendChild(row);
+    }
+  }
+
+  // Anropa updateScoreTable-funktionen när inmatningsvärden ändras
+  var holeScoreInputs = document.querySelectorAll('.form-control');
+  holeScoreInputs.forEach(function(input) {
+    input.addEventListener('change', function() {
+      updateScorecard(); // Uppdatera först över/under par
+      updateScoreTable(); // Uppdatera sedan slagtabel
+    });
+  });
+
+</script>
+
+</body>
+</html>

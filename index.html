@@ -124,7 +124,6 @@
             <th>Index</th>
             <th>Distans</th>
             <th>Slag</th>
-            <th>Par</th>
           </tr>
         </thead>
         <tbody id="scorecard-body">
@@ -257,7 +256,6 @@
         <td><input type="number" class="form-control index-input" value="${index}" min="1" readonly></td>
         <td><input type="number" class="form-control distance-input" value="${distance}" min="0" readonly></td>
         <td><input type="number" class="form-control slag-input" value="0" min="0"></td>
-        <td class="over-under-cell">0</td>
       `;
       return row;
     }
@@ -273,8 +271,6 @@
         const slagInput = row.querySelector('.slag-input');
         const slag = parseInt(slagInput.value) || 0;
         const overUnder = slag ? slag - par : 0;
-
-        row.querySelector('.over-under-cell').textContent = overUnder;
 
         totalPar += par;
         totalSlags += slag ? slag : 0;
@@ -301,3 +297,4 @@
 </script>
 </body>
 </html>
+

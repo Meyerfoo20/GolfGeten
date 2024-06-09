@@ -1,301 +1,326 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GolfGeten Scorekort</title>
-  <!-- Bootstrap CSS -->
-  <link rel="icon" href="logo.png" type="image/png">
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .input-group-text {
-      width: 60px;
-    }
-
-    body {
-      background-color: #f0f8ff;
-      color: #333;
-    }
-
-    .container {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-      padding: 30px;
-    }
-
-    .form-control {
-      border-color: #3498db;
-    }
-
-    .form-control:focus {
-      box-shadow: none;
-      border-color: #3498db;
-    }
-
-    .table thead th {
-      background-color: #3498db;
-      color: #fff;
-      border-color: #3498db;
-    }
-
-    .table tbody tr:hover {
-      background-color: rgba(52, 152, 219, 0.1);
-    }
-
-    .over-under-cell {
-      font-weight: bold;
-    }
-
-    .over-under-cell.positive {
-      color: #27ae60;
-    }
-
-    .over-under-cell.negative {
-      color: #c0392b;
-    }
-
-    .input-group-text {
-      background-color: #3498db;
-      border-color: #3498db;
-      color: #fff;
-    }
-
-    .input-group-text:hover {
-      background-color: #2980b9;
-      border-color: #2980b9;
-    }
-
-    select.form-control:hover,
-    select.form-control:focus {
-      background-color: #3498db;
-      border-color: #3498db;
-      color: #fff;
-    }
-
-    select.form-control option {
-      background-color: #fff;
-      color: #333;
-    }
-
-    select.form-control option:hover {
-      background-color: #f0f8ff;
-      color: #333;
-    }
-
-    .form-control:disabled,
-    .form-control[readonly] {
-      background-color: #f0f8ff;
-      color: #333;
-    }
-
-    .Sammanfattning {
-      color: #2980b9;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scorekort</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #007bff;
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
+        }
+        table {
+            margin-top: 20px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+        }
+        td {
+            text-align: center;
+        }
+        .score-input {
+            width: 60px;
+            margin: auto;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .total-cell {
+            background-color: #e9ecef;
+        }
+        .form-row {
+            margin-bottom: 15px;
+        }
+        .alert {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-
-<div class="container my-5">
-  <h1 class="text-center mb-4"  style="color: #3498db; font-size: 50px; font-weight: bolder;">Golf Scorekort</h1>
-
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <label for="club-select">Välj Golfklubb:</label>
-      <select id="club-select" class="form-control">
-        <!-- Options will be populated by JavaScript -->
-      </select>
+    <div class="container">
+        <h1 class="my-4">Scorekort</h1>
+        <div class="alert alert-danger" id="errorAlert" role="alert">
+            Var vänlig fyll i alla fält.
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="clubSelect">Välj klubb:</label>
+                <select class="form-control" id="clubSelect" onchange="loadCourses()">
+                    <option value="">Välj klubb</option>
+                    <option value="club1">Vasatorp GK</option>
+                    <option value="club2">Allerum GK</option>
+                    <option value="club3">Barsebäcks Golf & Country Club</option>
+                    <!-- Add more clubs as needed -->
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="courseSelect">Välj bana:</label>
+                <select class="form-control" id="courseSelect" onchange="loadCourseDetails()">
+                    <option value="">Välj bana</option>
+                    <!-- Courses will be loaded dynamically based on selected club -->
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="numPlayers">Antal spelare:</label>
+            <input type="number" class="form-control" id="numPlayers" min="1" placeholder="Ange antal spelare">
+        </div>
+        <button class="btn btn-primary" onclick="addPlayerNames()">Ange spelarnamn</button>
+        <hr>
+        <div id="playerNamesForm" class="mt-4">
+            <!-- Player names input fields will be generated here -->
+        </div>
+        <button class="btn btn-primary mt-2" onclick="validateAndCreateScorecard()">Skapa scorekort</button>
+        <hr>
+        <form id="scorecardForm" class="mt-4">
+            <!-- Scorecard will be generated here -->
+        </form>
     </div>
-    <div class="col-md-6">
-      <label for="course-select">Välj Bana:</label>
-      <select id="course-select" class="form-control" disabled>
-        <!-- Options will be populated by JavaScript -->
-      </select>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="col-12">
-      <table class="table table-bordered">
-        <thead class="thead">
-          <tr>
-            <th>Hål</th>
-            <th>Par</th>
-            <th>Index</th>
-            <th>Distans</th>
-            <th>Slag</th>
-          </tr>
-        </thead>
-        <tbody id="scorecard-body">
-          <!-- Rows will be generated by JavaScript -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+    <script>
+        const courses = {
+            club1: {
+                courseA: {
+                    name: "TC",
+                    pars: [4, 3, 5, 3, 4, 5, 4, 4, 4, 5, 4, 5, 4, 3, 4, 4, 3, 4],
+                    indexes: [10, 12, 4, 18, 2, 16, 8, 14, 6, 9, 15, 7, 1, 13, 3, 5, 17, 11]
+                },
+                courseB: {
+                    name: "Classic Course",
+                    pars: [5, 4, 4, 3, 5, 4, 3, 4, 4, 4, 5, 4, 4, 3, 4, 4, 3, 5],
+                    indexes: [12, 4, 16, 18, 2, 8, 10, 14, 6, 5, 11, 1, 15, 13, 3, 7, 17, 9]
+                },
+                courseC: {
+                    name: "Park Course",
+                    par: [3, 4, 4, 5, 3, 4, 3, 4, 4, 3, 5, 3],
+                    indexes: [13, 9, 5, 7, 15, 3, 17, 11, 1, 14, 4, 12]
+                }
+            },
+            club2: {
+                courseD: {
+                    name: "Ängsbanan",
+                    pars: [3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4],
+                    indexes: [18, 3, 14, 7, 16, 6, 13, 1, 15, 2, 11, 8, 17, 4, 10, 9, 12, 5]
+                }
+            },
+            club3: {
+                courseE: {
+                    name: "Ocean Course",
+                    pars: [4, 4, 4, 3, 5, 4, 4, 3, 5, 4, 4, 5, 4, 4, 3, 5, 4, 4],
+                    indexes: [3, 17, 11, 7, 15, 5, 1, 13, 9, 8, 4, 18, 12, 6, 14, 16, 2, 10]
+                }
+            }
+        };
 
-  <!-- Totals section -->
-  <div class="row mt-4 Sammanfattning">
-    <div class="col-12">
-      <h3>Sammanfattning:</h3>
-      <table class="table table-bordered">
-        <tbody>
-          <tr>
-            <th style="color: #3498db;">Totalt Par</th>
-            <td id="total-par" style="color: #3498db;">0</td>
-          </tr>
-          <tr>
-            <th style="color: #3498db;">Totalt Slag</th>
-            <td id="total-slags" style="color: #3498db;">0</td>
-          </tr>
-          <tr>
-            <th style="color: #3498db;">Totalt Över/Under Par</th>
-            <td id="total-over-under" style="color: #3498db;">0</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+        function loadCourses() {
+            const clubSelect = document.getElementById('clubSelect').value;
+            const courseSelect = document.getElementById('courseSelect');
+            courseSelect.innerHTML = '<option value="">Välj bana</option>';
 
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const clubs = {
-      "Allerum GK": {
-        "Ängsbanan": {
-          "par": [3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4],
-          "index": [18, 3, 14, 7, 16, 6, 13, 1, 15, 2, 11, 8, 17, 4, 10, 9, 12, 5],
-          "distance": [160, 365, 330, 490, 150, 370, 335, 495, 140, 360, 340, 485, 145, 355, 345, 475, 135, 350]
+            if (clubSelect) {
+                const clubCourses = courses[clubSelect];
+                for (const courseKey in clubCourses) {
+                    if (clubCourses.hasOwnProperty(courseKey)) {
+                        const option = document.createElement('option');
+                        option.value = courseKey;
+                        option.textContent = clubCourses[courseKey].name;
+                        courseSelect.appendChild(option);
+                    }
+                }
+            }
         }
-      },
-      
-      "Vasatorp GK": {
-        "TC": {
-          "par": [4, 3, 5, 3, 4, 5, 4, 4, 4, 5, 4, 5, 4, 3, 4, 4, 3, 4],
-          "index": [10, 12, 4, 18, 2, 16, 8, 14, 6, 9, 15, 7, 1, 13, 3, 5, 17, 11],
-          "distance": [365, 129, 454, 163, 301, 406, 321, 271, 345, 457, 313, 474, 359, 135, 361, 366, 123, 363]
-        },
-        "Classic Course": {
-          "par": [5, 4, 4, 3, 5, 4, 3, 4, 4, 4, 5, 4, 4, 3, 4, 4, 3, 5],
-          "index": [12, 4, 16, 18, 2, 8, 10, 14, 6, 5, 11, 1, 15, 13, 3, 7, 17, 9],
-          "distance": [436, 346, 253, 130, 481, 346, 179, 322, 348, 350, 460, 378, 320, 162, 336, 313, 143, 505]
-        },
-        "Park Course": {
-          "par": [3, 4, 4, 5, 3, 4, 3, 4, 4, 3, 5, 3],
-          "index": [13, 9, 5, 7, 15, 3, 17, 11, 1, 14, 4, 12],
-          "distance": [115, 335, 370, 440, 150, 295, 140, 315, 325, 140, 500, 125]
+
+        function loadCourseDetails() {
+            const clubSelect = document.getElementById('clubSelect').value;
+            const courseSelect = document.getElementById('courseSelect').value;
+
+            if (clubSelect && courseSelect) {
+                const courseDetails = courses[clubSelect][courseSelect];
+                createScorecard(courseDetails);
+            }
         }
-      }
-    };
 
-    const clubSelect = document.getElementById('club-select');
-    const courseSelect = document.getElementById('course-select');
-    const scorecardBody = document.getElementById('scorecard-body');
-    const totalParElement = document.getElementById('total-par');
-    const totalSlagsElement = document.getElementById('total-slags');
-    const totalOverUnderElement = document.getElementById('total-over-under');
+        function addPlayerNames() {
+            const numPlayers = document.getElementById('numPlayers').value;
+            const playerNamesForm = document.getElementById('playerNamesForm');
+            playerNamesForm.innerHTML = '';
 
-    let totalPar = 0;
-    let totalSlags = 0;
-    let totalOverUnder = 0;
+            if (numPlayers > 0) {
+                for (let i = 1; i <= numPlayers; i++) {
+                    const div = document.createElement('div');
+                    div.className = 'form-group';
 
-    // Populate club select options
-    Object.keys(clubs).forEach(club => {
-      const option = document.createElement('option');
-      option.value = club;
-      option.textContent = club;
-      clubSelect.appendChild(option);
-    });
+                    const label = document.createElement('label');
+                    label.for = `playerName${i}`;
+                    label.textContent = `Spelare ${i} namn:`;
 
-    // Update course options when a club is selected
-    clubSelect.addEventListener('change', function () {
-      courseSelect.innerHTML = '';
-      const selectedClub = clubs[clubSelect.value];
-      if (selectedClub) {
-        Object.keys(selectedClub).forEach(course => {
-          const option = document.createElement('option');
-          option.value = course;
-          option.textContent = course;
-          courseSelect.appendChild(option);
-        });
-        courseSelect.disabled = false;
-        loadCourseData();
-      } else {
-        courseSelect.disabled = true;
-      }
-    });
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'form-control';
+                    input.id = `playerName${i}`;
+                    input.name = `playerName${i}`;
+                    input.placeholder = `Ange namn för spelare ${i}`;
 
-    // Load course data when a course is selected
-    courseSelect.addEventListener('change', loadCourseData);
+                    div.appendChild(label);
+                    div.appendChild(input);
+                    playerNamesForm.appendChild(div);
+                }
+            }
+        }
 
-    function loadCourseData() {
-      const selectedClub = clubs[clubSelect.value];
-      const selectedCourse = selectedClub ? selectedClub[courseSelect.value] : {};
-      const parData = selectedCourse.par || [];
-      const indexData = selectedCourse.index || [];
-      const distanceData = selectedCourse.distance || [];
-      scorecardBody.innerHTML = '';
+        function validateAndCreateScorecard() {
+            const clubSelect = document.getElementById('clubSelect').value;
+            const courseSelect = document.getElementById('courseSelect').value;
+            const numPlayers = document.getElementById('numPlayers').value;
+            const playerNamesForm = document.getElementById('playerNamesForm');
 
-      if (parData.length && indexData.length && distanceData.length) {
-        parData.forEach((par, index) => {
-          const row = createRow(index + 1, par, indexData[index], distanceData[index]);
-          scorecardBody.appendChild(row);
-        });
-        updateTotals();
-      }
-    }
+            if (!clubSelect || !courseSelect || !numPlayers || playerNamesForm.innerHTML === '') {
+                document.getElementById('errorAlert').style.display = 'block';
+            } else {
+                document.getElementById('errorAlert').style.display = 'none';
+                loadCourseDetails();
+            }
+        }
 
-    // Function to create table rows
-    function createRow(holeNumber, par, index, distance) {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${holeNumber}</td>
-        <td><input type="number" class="form-control par-input" value="${par}" min="1" readonly></td>
-        <td><input type="number" class="form-control index-input" value="${index}" min="1" readonly></td>
-        <td><input type="number" class="form-control distance-input" value="${distance}" min="0" readonly></td>
-        <td><input type="number" class="form-control slag-input" value="0" min="0"></td>
-      `;
-      return row;
-    }
+        function createScorecard(courseDetails) {
+            const numPlayers = document.getElementById('numPlayers').value;
+            const scorecardForm = document.getElementById('scorecardForm');
+            scorecardForm.innerHTML = '';
 
-    // Function to update totals
-    function updateTotals() {
-      totalPar = 0;
-      totalSlags = 0;
-      totalOverUnder = 0;
+            const playerNames = [];
+            for (let i = 1; i <= numPlayers; i++) {
+                const playerNameInput = document.getElementById(`playerName${i}`);
+                playerNames.push(playerNameInput.value || `Spelare ${i}`);
+            }
 
-      scorecardBody.querySelectorAll('tr').forEach(row => {
-        const par = parseInt(row.querySelector('.par-input').value) || 0;
-        const slagInput = row.querySelector('.slag-input');
-        const slag = parseInt(slagInput.value) || 0;
-        const overUnder = slag ? slag - par : 0;
+            if (numPlayers > 0 && courseDetails) {
+                const table = document.createElement('table');
+                table.className = 'table table-bordered';
 
-        totalPar += par;
-        totalSlags += slag ? slag : 0;
-        totalOverUnder += slag ? overUnder : 0;
-      });
+                const thead = document.createElement('thead');
+                const headerRow = document.createElement('tr');
 
-      totalParElement.textContent = totalPar;
-      totalSlagsElement.textContent = totalSlags;
-      totalOverUnderElement.textContent = totalOverUnder;
-    }
+                const headers = ['Hål', 'Par', 'Index'];
+                playerNames.forEach(name => headers.push(name));
+                headers.push('Totalt');
 
-    // Add event listeners to update totals on input change
-    scorecardBody.addEventListener('input', function (event) {
-      if (event.target.classList.contains('slag-input')) {
-        updateTotals();
-      }
-    });
+                headers.forEach(headerText => {
+                    const th = document.createElement('th');
+                    th.textContent = headerText;
+                    headerRow.appendChild(th);
+                });
 
-    // Initial load for default selection
-    if (clubSelect.value) {
-      loadCourseData();
-    }
-  });
-</script>
+                thead.appendChild(headerRow);
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+
+                for (let hole = 1; hole <= 18; hole++) {
+                    const row = document.createElement('tr');
+
+                    const holeCell = document.createElement('td');
+                    holeCell.textContent = `${hole}`;
+                    row.appendChild(holeCell);
+
+                    const parCell = document.createElement('td');
+                    parCell.textContent = courseDetails.pars[hole - 1];
+                    row.appendChild(parCell);
+
+                    const indexCell = document.createElement('td');
+                    indexCell.textContent = courseDetails.indexes[hole - 1];
+                    row.appendChild(indexCell);
+
+                    for (let player = 1; player <= numPlayers; player++) {
+                        const scoreCell = document.createElement('td');
+                        const input = document.createElement('input');
+                        input.type = 'number';
+                        input.className = 'form-control score-input';
+                        input.name = `player${player}hole${hole}`;
+                        input.oninput = calculateTotals;
+                        scoreCell.appendChild(input);
+                        row.appendChild(scoreCell);
+                    }
+
+                    const totalCell = document.createElement('td');
+                    totalCell.id = `totalHole${hole}`;
+                    row.appendChild(totalCell);
+
+                    tbody.appendChild(row);
+                }
+
+                const footerRow = document.createElement('tr');
+                footerRow.className = 'total-row';
+
+                const footerCell = document.createElement('td');
+                footerCell.textContent = 'Totalt';
+                footerRow.appendChild(footerCell);
+
+                for (let player = 1; player <= numPlayers; player++) {
+                    const totalScoreCell = document.createElement('td');
+                    totalScoreCell.id = `totalPlayer${player}`;
+                    totalScoreCell.className = 'total-cell';
+                    footerRow.appendChild(totalScoreCell);
+                }
+
+                const grandTotalCell = document.createElement('td');
+                grandTotalCell.id = 'grandTotal';
+                grandTotalCell.className = 'total-cell';
+                footerRow.appendChild(grandTotalCell);
+
+                tbody.appendChild(footerRow);
+                table.appendChild(tbody);
+
+                scorecardForm.appendChild(table);
+            }
+        }
+
+        function calculateTotals() {
+            const numPlayers = document.getElementById('numPlayers').value;
+            let grandTotal = 0;
+
+            for (let player = 1; player <= numPlayers; player++) {
+                let playerTotal = 0;
+
+                for (let hole = 1; hole <= 18; hole++) {
+                    const scoreInput = document.querySelector(`input[name=player${player}hole${hole}]`);
+                    const scoreValue = parseInt(scoreInput.value) || 0;
+                    playerTotal += scoreValue;
+                }
+
+                document.getElementById(`totalPlayer${player}`).textContent = playerTotal;
+                grandTotal += playerTotal;
+            }
+
+            document.getElementById('grandTotal').textContent = grandTotal;
+        }
+    </script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
-

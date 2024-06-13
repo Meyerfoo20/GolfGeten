@@ -1,326 +1,305 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scorekort</title>
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>GolfWebbplats</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         body {
+            font-family: Arial, sans-serif;
             background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
         }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        header {
+            background-color: #004d00; /* Mörk grön */
         }
-        h1 {
-            text-align: center;
-            color: #007bff;
-        }
-        .form-group label {
+
+        header .logo {
+            font-size: 1.5em;
             font-weight: bold;
         }
-        .btn-primary {
-            background-color: #007bff;
-            border-color: #007bff;
+
+        header .icons i {
+            margin: 0 5px;
+            font-size: 1.2em;
         }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #004085;
+
+        .carousel {
+            box-shadow: 0 4px 8px rgba(0, 128, 0, 0.5); /* Grön skugga */
+            border-radius: 20px;
         }
-        table {
+
+        .carousel-inner img {
+            height: 300px;
+            object-fit: cover;
+            border-radius: 20px; /* Rundade hörn */
+        }
+
+        .carousel-caption {
+            background: rgba(0, 77, 0, 0.7); /* Mörk grön med transparens */
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        section h2 {
+            color: #004d00; /* Mörk grön */
             margin-top: 20px;
+            margin-bottom: 10px;
         }
-        th {
-            background-color: #007bff;
-            color: white;
-            text-align: center;
+
+        .card {
+            border: 1px solid #004d00; /* Mörk grön */
         }
-        td {
-            text-align: center;
+
+        .card-title {
+            color: #004d00; /* Mörk grön */
         }
-        .score-input {
-            width: 60px;
-            margin: auto;
+
+        .card-text {
+            color: #333;
         }
-        .total-row {
-            font-weight: bold;
+
+        .navbar {
+            background-color: #008000; /* Grön */
         }
-        .total-cell {
-            background-color: #e9ecef;
+
+        .navbar-brand {
+            color: #fff; /* Vit */
+            font-size: 1em;
         }
-        .form-row {
-            margin-bottom: 15px;
+
+        .navbar-brand:hover {
+            text-decoration: none;
+            color: #ccffcc; /* Ljusare grön för hover */
         }
-        .alert {
-            display: none;
+
+        /* Sidopanel */
+        .side-panel {
+            position: fixed;
+            top: 0;
+            right: -30%;
+            width: 30%;
+            height: 100%;
+            background-color: #e6ffe6; /* Ljus grön bakgrund */
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            transition: right 0.3s;
+            padding: 20px;
+        }
+
+        .side-panel.active {
+            right: 0;
+        }
+
+        .side-panel .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .side-panel h3 {
+            color: #004d00; /* Mörk grön */
+            margin-bottom: 20px;
+        }
+
+        .side-panel label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .side-panel .toggle-switch {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .side-panel .toggle-switch input {
+            margin-right: 10px;
+        }
+
+        /* Mörkt läge */
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1 class="my-4">Scorekort</h1>
-        <div class="alert alert-danger" id="errorAlert" role="alert">
-            Var vänlig fyll i alla fält.
+    <header class="d-flex justify-content-between align-items-center p-3 text-white">
+        <div class="logo">GolfSite</div>
+        <div class="icons">
+            <i class="fas fa-wifi" id="wifi-icon"></i>
+            <i class="fas fa-battery-full" id="battery-icon"></i>
+            <i class="fas fa-cog" id="settings-icon"></i>
         </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="clubSelect">Välj klubb:</label>
-                <select class="form-control" id="clubSelect" onchange="loadCourses()">
-                    <option value="">Välj klubb</option>
-                    <option value="club1">Vasatorp GK</option>
-                    <option value="club2">Allerum GK</option>
-                    <option value="club3">Barsebäcks Golf & Country Club</option>
-                    <!-- Add more clubs as needed -->
-                </select>
+    </header>
+    
+    <main class="container" style="margin-top: 30px;">
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+                <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="slide1.jpg" class="d-block w-100" alt="Golfbild 1">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Range</h5>
+                        <p>Förbättra ditt spel med dessa tips och tricks.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="slide2.jpg" class="d-block w-100" alt="Golfbild 2">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Golfbanor</h5>
+                        <p>Läs på om Sveriges olika banor eller ta ut ett scorekort till dem.</p>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <img src="slide3.jpg" class="d-block w-100" alt="Golfbild 3">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>Swing</h5>
+                        <p>Analysera och spara din Swing på hemsidan.</p>
+                    </div>
+                </div>
             </div>
-            <div class="form-group col-md-6">
-                <label for="courseSelect">Välj bana:</label>
-                <select class="form-control" id="courseSelect" onchange="loadCourseDetails()">
-                    <option value="">Välj bana</option>
-                    <!-- Courses will be loaded dynamically based on selected club -->
-                </select>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Föregående</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Nästa</span>
+            </a>
+        </div>
+        
+        <section class="mt-4">
+            <h2>Senaste Nytt</h2>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">Resultat från Golftävlingen</h5>
+                    <p class="card-text">Kolla in resultaten från den senaste golftävlingen.</p>
+                </div>
             </div>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h5 class="card-title">Nya Golfbanor</h5>
+                    <p class="card-text">Utforska de nyligen öppnade golfbanorna i ditt område.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <nav class="navbar fixed-bottom">
+        <a class="navbar-brand" href="index.html"><i class="fas fa-home"></i> Hem</a>
+        <a class="navbar-brand" href="range.html"><i class="fas fa-golf-ball"></i> Range</a>
+        <a class="navbar-brand" href="course.html"><i class="fas fa-flag"></i> Course</a>
+        <a class="navbar-brand" href="swing.html"><i class="fas fa-camera"></i> Swing</a>
+    </nav>
+
+    <div class="side-panel" id="side-panel">
+        <span class="close-btn" id="close-btn">&times;</span>
+        <h3>Inställningar</h3>
+        <div class="toggle-switch">
+            <input type="checkbox" id="dark-mode-toggle">
+            <label for="dark-mode-toggle">Mörkt läge</label>
         </div>
-        <div class="form-group">
-            <label for="numPlayers">Antal spelare:</label>
-            <input type="number" class="form-control" id="numPlayers" min="1" placeholder="Ange antal spelare">
-        </div>
-        <button class="btn btn-primary" onclick="addPlayerNames()">Ange spelarnamn</button>
-        <hr>
-        <div id="playerNamesForm" class="mt-4">
-            <!-- Player names input fields will be generated here -->
-        </div>
-        <button class="btn btn-primary mt-2" onclick="validateAndCreateScorecard()">Skapa scorekort</button>
-        <hr>
-        <form id="scorecardForm" class="mt-4">
-            <!-- Scorecard will be generated here -->
-        </form>
+        <button id="login-btn" class="btn btn-primary">Logga in</button>
+        <button id="logout-btn" class="btn btn-secondary d-none">Logga ut</button>
     </div>
 
-    <script>
-        const courses = {
-            club1: {
-                courseA: {
-                    name: "TC",
-                    pars: [4, 3, 5, 3, 4, 5, 4, 4, 4, 5, 4, 5, 4, 3, 4, 4, 3, 4],
-                    indexes: [10, 12, 4, 18, 2, 16, 8, 14, 6, 9, 15, 7, 1, 13, 3, 5, 17, 11]
-                },
-                courseB: {
-                    name: "Classic Course",
-                    pars: [5, 4, 4, 3, 5, 4, 3, 4, 4, 4, 5, 4, 4, 3, 4, 4, 3, 5],
-                    indexes: [12, 4, 16, 18, 2, 8, 10, 14, 6, 5, 11, 1, 15, 13, 3, 7, 17, 9]
-                },
-                courseC: {
-                    name: "Park Course",
-                    par: [3, 4, 4, 5, 3, 4, 3, 4, 4, 3, 5, 3],
-                    indexes: [13, 9, 5, 7, 15, 3, 17, 11, 1, 14, 4, 12]
-                }
-            },
-            club2: {
-                courseD: {
-                    name: "Ängsbanan",
-                    pars: [3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4, 5, 3, 4],
-                    indexes: [18, 3, 14, 7, 16, 6, 13, 1, 15, 2, 11, 8, 17, 4, 10, 9, 12, 5]
-                }
-            },
-            club3: {
-                courseE: {
-                    name: "Ocean Course",
-                    pars: [4, 4, 4, 3, 5, 4, 4, 3, 5, 4, 4, 5, 4, 4, 3, 5, 4, 4],
-                    indexes: [3, 17, 11, 7, 15, 5, 1, 13, 9, 8, 4, 18, 12, 6, 14, 16, 2, 10]
-                }
-            }
-        };
-
-        function loadCourses() {
-            const clubSelect = document.getElementById('clubSelect').value;
-            const courseSelect = document.getElementById('courseSelect');
-            courseSelect.innerHTML = '<option value="">Välj bana</option>';
-
-            if (clubSelect) {
-                const clubCourses = courses[clubSelect];
-                for (const courseKey in clubCourses) {
-                    if (clubCourses.hasOwnProperty(courseKey)) {
-                        const option = document.createElement('option');
-                        option.value = courseKey;
-                        option.textContent = clubCourses[courseKey].name;
-                        courseSelect.appendChild(option);
-                    }
-                }
-            }
-        }
-
-        function loadCourseDetails() {
-            const clubSelect = document.getElementById('clubSelect').value;
-            const courseSelect = document.getElementById('courseSelect').value;
-
-            if (clubSelect && courseSelect) {
-                const courseDetails = courses[clubSelect][courseSelect];
-                createScorecard(courseDetails);
-            }
-        }
-
-        function addPlayerNames() {
-            const numPlayers = document.getElementById('numPlayers').value;
-            const playerNamesForm = document.getElementById('playerNamesForm');
-            playerNamesForm.innerHTML = '';
-
-            if (numPlayers > 0) {
-                for (let i = 1; i <= numPlayers; i++) {
-                    const div = document.createElement('div');
-                    div.className = 'form-group';
-
-                    const label = document.createElement('label');
-                    label.for = `playerName${i}`;
-                    label.textContent = `Spelare ${i} namn:`;
-
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.className = 'form-control';
-                    input.id = `playerName${i}`;
-                    input.name = `playerName${i}`;
-                    input.placeholder = `Ange namn för spelare ${i}`;
-
-                    div.appendChild(label);
-                    div.appendChild(input);
-                    playerNamesForm.appendChild(div);
-                }
-            }
-        }
-
-        function validateAndCreateScorecard() {
-            const clubSelect = document.getElementById('clubSelect').value;
-            const courseSelect = document.getElementById('courseSelect').value;
-            const numPlayers = document.getElementById('numPlayers').value;
-            const playerNamesForm = document.getElementById('playerNamesForm');
-
-            if (!clubSelect || !courseSelect || !numPlayers || playerNamesForm.innerHTML === '') {
-                document.getElementById('errorAlert').style.display = 'block';
-            } else {
-                document.getElementById('errorAlert').style.display = 'none';
-                loadCourseDetails();
-            }
-        }
-
-        function createScorecard(courseDetails) {
-            const numPlayers = document.getElementById('numPlayers').value;
-            const scorecardForm = document.getElementById('scorecardForm');
-            scorecardForm.innerHTML = '';
-
-            const playerNames = [];
-            for (let i = 1; i <= numPlayers; i++) {
-                const playerNameInput = document.getElementById(`playerName${i}`);
-                playerNames.push(playerNameInput.value || `Spelare ${i}`);
-            }
-
-            if (numPlayers > 0 && courseDetails) {
-                const table = document.createElement('table');
-                table.className = 'table table-bordered';
-
-                const thead = document.createElement('thead');
-                const headerRow = document.createElement('tr');
-
-                const headers = ['Hål', 'Par', 'Index'];
-                playerNames.forEach(name => headers.push(name));
-                headers.push('Totalt');
-
-                headers.forEach(headerText => {
-                    const th = document.createElement('th');
-                    th.textContent = headerText;
-                    headerRow.appendChild(th);
-                });
-
-                thead.appendChild(headerRow);
-                table.appendChild(thead);
-
-                const tbody = document.createElement('tbody');
-
-                for (let hole = 1; hole <= 18; hole++) {
-                    const row = document.createElement('tr');
-
-                    const holeCell = document.createElement('td');
-                    holeCell.textContent = `${hole}`;
-                    row.appendChild(holeCell);
-
-                    const parCell = document.createElement('td');
-                    parCell.textContent = courseDetails.pars[hole - 1];
-                    row.appendChild(parCell);
-
-                    const indexCell = document.createElement('td');
-                    indexCell.textContent = courseDetails.indexes[hole - 1];
-                    row.appendChild(indexCell);
-
-                    for (let player = 1; player <= numPlayers; player++) {
-                        const scoreCell = document.createElement('td');
-                        const input = document.createElement('input');
-                        input.type = 'number';
-                        input.className = 'form-control score-input';
-                        input.name = `player${player}hole${hole}`;
-                        input.oninput = calculateTotals;
-                        scoreCell.appendChild(input);
-                        row.appendChild(scoreCell);
-                    }
-
-                    const totalCell = document.createElement('td');
-                    totalCell.id = `totalHole${hole}`;
-                    row.appendChild(totalCell);
-
-                    tbody.appendChild(row);
-                }
-
-                const footerRow = document.createElement('tr');
-                footerRow.className = 'total-row';
-
-                const footerCell = document.createElement('td');
-                footerCell.textContent = 'Totalt';
-                footerRow.appendChild(footerCell);
-
-                for (let player = 1; player <= numPlayers; player++) {
-                    const totalScoreCell = document.createElement('td');
-                    totalScoreCell.id = `totalPlayer${player}`;
-                    totalScoreCell.className = 'total-cell';
-                    footerRow.appendChild(totalScoreCell);
-                }
-
-                const grandTotalCell = document.createElement('td');
-                grandTotalCell.id = 'grandTotal';
-                grandTotalCell.className = 'total-cell';
-                footerRow.appendChild(grandTotalCell);
-
-                tbody.appendChild(footerRow);
-                table.appendChild(tbody);
-
-                scorecardForm.appendChild(table);
-            }
-        }
-
-        function calculateTotals() {
-            const numPlayers = document.getElementById('numPlayers').value;
-            let grandTotal = 0;
-
-            for (let player = 1; player <= numPlayers; player++) {
-                let playerTotal = 0;
-
-                for (let hole = 1; hole <= 18; hole++) {
-                    const scoreInput = document.querySelector(`input[name=player${player}hole${hole}]`);
-                    const scoreValue = parseInt(scoreInput.value) || 0;
-                    playerTotal += scoreValue;
-                }
-
-                document.getElementById(`totalPlayer${player}`).textContent = playerTotal;
-                grandTotal += playerTotal;
-            }
-
-            document.getElementById('grandTotal').textContent = grandTotal;
-        }
-    </script>
-
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            function updateBatteryStatus(battery) {
+                const batteryIcon = document.getElementById('battery-icon');
+                let level = battery.level * 100;
+
+                if (level > 75) {
+                    batteryIcon.className = 'fas fa-battery-full';
+                } else if (level > 50) {
+                    batteryIcon.className = 'fas fa-battery-three-quarters';
+                } else if (level > 25) {
+                    batteryIcon.className = 'fas fa-battery-half';
+                } else if (level > 10) {
+                    batteryIcon.className = 'fas fa-battery-quarter';
+                } else {
+                    batteryIcon.className = 'fas fa-battery-empty';
+                }
+            }
+
+            navigator.getBattery().then(function(battery) {
+                updateBatteryStatus(battery);
+
+                battery.addEventListener('levelchange', function() {
+                    updateBatteryStatus(battery);
+                });
+            });
+
+            function updateWifiStatus() {
+                const wifiIcon = document.getElementById('wifi-icon');
+                if (navigator.onLine) {
+                    wifiIcon.className = 'fas fa-wifi';
+                } else {
+                    wifiIcon.className = 'fas fa-wifi-slash';
+                }
+            }
+
+            updateWifiStatus();
+            window.addEventListener('online', updateWifiStatus);
+            window.addEventListener('offline', updateWifiStatus);
+
+            // Sidopanelens funktionalitet
+            const settingsIcon = document.getElementById('settings-icon');
+            const sidePanel = document.getElementById('side-panel');
+            const closeBtn = document.getElementById('close-btn');
+            const darkModeToggle = document.getElementById('dark-mode-toggle');
+            const loginBtn = document.getElementById('login-btn');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            settingsIcon.addEventListener('click', () => {
+                sidePanel.classList.add('active');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                sidePanel.classList.remove('active');
+            });
+
+            darkModeToggle.addEventListener('change', () => {
+                if (darkModeToggle.checked) {
+                    document.body.classList.add('dark-mode');
+                } else {
+                    document.body.classList.remove('dark-mode');
+                }
+            });
+
+            loginBtn.addEventListener('click', () => {
+                loginBtn.classList.add('d-none');
+                logoutBtn.classList.remove('d-none');
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                logoutBtn.classList.add('d-none');
+                loginBtn.classList.remove('d-none');
+            });
+        });
+
+        // Extra CSS för mörkt läge
+        const darkModeStyle = document.createElement('style');
+        darkModeStyle.innerHTML = `
+            .dark-mode {
+                background-color: #222;
+            }
+        `;
+        document.head.appendChild(darkModeStyle);
+    </script>
 </body>
 </html>

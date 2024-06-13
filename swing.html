@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GolfWebbplats - Swing</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        header {
+            background-color: #004d00; /* Mörk grön */
+        }
+
+        header .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        header .icons i {
+            margin: 0 5px;
+            font-size: 1.2em;
+        }
+
+        .navbar {
+            background-color: #008000; /* Grön */
+        }
+
+        .navbar-brand {
+            color: #fff; /* Vit */
+            font-size: 1em;
+        }
+
+        .navbar-brand:hover {
+            text-decoration: none;
+            color: #ccffcc; /* Ljusare grön för hover */
+        }
+
+        .video-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .video-container video {
+            max-width: 100%;
+            border: 2px solid #004d00;
+            border-radius: 10px;
+        }
+
+        .video-container button {
+            margin-top: 10px;
+        }
+
+        .video-feed {
+            margin-top: 30px;
+        }
+
+        .video-feed .video-item {
+            margin-bottom: 20px;
+        }
+
+        .video-feed .video-item video {
+            width: 100%;
+            border: 1px solid #004d00;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header class="d-flex justify-content-between align-items-center p-3 text-white">
+        <div class="logo">GolfSite</div>
+        <div class="icons">
+            <i class="fas fa-wifi" id="wifi-icon"></i>
+            <i class="fas fa-battery-full" id="battery-icon"></i>
+            <i class="fas fa-cog" id="settings-icon"></i>
+        </div>
+    </header>
+    
+    <nav class="navbar fixed-bottom">
+        <a class="navbar-brand" href="index.html"><i class="fas fa-home"></i> Hem</a>
+        <a class="navbar-brand" href="range.html"><i class="fas fa-golf-ball"></i> Range</a>
+        <a class="navbar-brand" href="course.html"><i class="fas fa-flag"></i> Course</a>
+        <a class="navbar-brand" href="swing.html"><i class="fas fa-camera"></i> Swing</a>
+    </nav>
+
+    <main class="container">
+        <section class="video-container">
+            <h2>Filma din Swing</h2>
+            <video id="swingVideo" controls></video>
+            <br>
+            <button id="startRecording" class="btn btn-success">Starta Inspelning</button>
+            <button id="stopRecording" class="btn btn-danger" disabled>Stoppa Inspelning</button>
+            <button id="saveVideo" class="btn btn-primary" disabled>Spara Video</button>
+        </section>
+        
+        <section class="video-feed" id="videoFeed">
+            <h2>Sparade Swing Videos</h2>
+            <!-- Sparade videos kommer att visas här -->
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const startButton = document.getElementById('startRecording');
+            const stopButton = document.getElementById('stopRecording');
+            const saveButton = document.getElementById('saveVideo');
+            const swingVideo = document.getElementById('swingVideo');
+            const videoFeed = document.getElementById('videoFeed');
+
+            let mediaRecorder;
+            let recordedChunks = [];
+
+            startButton.addEventListener('click', async () => {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                swingVideo.srcObject = stream;
+                swingVideo.play();
+
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.start();
+
+                startButton.disabled = true;
+                stopButton.disabled = false;
+                saveButton.disabled = true;
+            });
+
+            stopButton.addEventListener('click', () => {
+                mediaRecorder.stop();
+                swingVideo.srcObject.getTracks().forEach(track => track.stop());
+
+                stopButton.disabled = true;
+                saveButton.disabled = false;
+            });
+
+            saveButton.addEventListener('click', () => {
+                const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                const videoUrl = URL.createObjectURL(videoBlob);
+
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.innerHTML = `
+                    <video controls>
+                        <source src="${videoUrl}" type="video/webm">
+                    </video>
+                `;
+
+                videoFeed.appendChild(videoItem);
+                recordedChunks = [];
+
+                saveButton.disabled = true;
+                startButton.disabled = false;
+            });
+
+            function updateBatteryStatus(battery) {
+                const batteryIcon = document.getElementById('battery-icon');
+                let level = battery.level * 100;
+
+                if (level > 75) {
+                    batteryIcon.className = 'fas fa-battery-full';
+                } else if (level > 50) {
+                    batteryIcon.className = 'fas fa-battery-three-quarters';
+                } else if (level > 25) {
+                    batteryIcon.className = 'fas fa-battery-half';
+                } else if (level > 10) {
+                    batteryIcon.className = 'fas fa-battery-quarter';
+                } else {
+                    batteryIcon.className = 'fas fa-battery-empty';
+                }
+            }
+
+            navigator.getBattery().then(function(battery) {
+                updateBatteryStatus(battery);
+
+                battery.addEventListener('levelchange', function() {
+                    updateBatteryStatus(battery);
+                });
+            });
+
+            function updateWifiStatus() {
+                const wifiIcon = document.getElementById('wifi-icon');
+                if (navigator.onLine) {
+                    wifiIcon.className = 'fas fa-wifi';
+                } else {
+                    wifiIcon.className = 'fas fa-wifi-slash';
+                }
+            }
+
+            updateWifiStatus();
+            window.addEventListener('online', updateWifiStatus);
+            window.addEventListener('offline', updateWifiStatus);
+        });
+    </script>
+</body>
+</html>

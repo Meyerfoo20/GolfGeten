@@ -95,6 +95,7 @@
             <button id="startRecording" class="btn btn-success">Starta Inspelning</button>
             <button id="stopRecording" class="btn btn-danger" disabled>Stoppa Inspelning</button>
             <button id="saveVideo" class="btn btn-primary" disabled>Spara Video</button>
+            <button id="flipCamera" class="btn btn-secondary">Byt Kamera</button>
         </section>
         
         <section class="video-feed" id="videoFeed">
@@ -108,18 +109,32 @@
             const startButton = document.getElementById('startRecording');
             const stopButton = document.getElementById('stopRecording');
             const saveButton = document.getElementById('saveVideo');
+            const flipButton = document.getElementById('flipCamera');
             const swingVideo = document.getElementById('swingVideo');
             const videoFeed = document.getElementById('videoFeed');
 
             let mediaRecorder;
             let recordedChunks = [];
+            let currentStream;
+            let useFrontCamera = true;
+
+            async function startCamera() {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+                const constraints = {
+                    video: { facingMode: useFrontCamera ? 'user' : 'environment' }
+                };
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                swingVideo.srcObject = currentStream;
+                swingVideo.play();
+            }
 
             startButton.addEventListener('click', async () => {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                swingVideo.srcObject = stream;
-                swingVideo.play();
+                await startCamera();
+                recordedChunks = [];
 
-                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(currentStream);
                 mediaRecorder.ondataavailable = event => {
                     if (event.data.size > 0) {
                         recordedChunks.push(event.data);
@@ -134,7 +149,7 @@
 
             stopButton.addEventListener('click', () => {
                 mediaRecorder.stop();
-                swingVideo.srcObject.getTracks().forEach(track => track.stop());
+                currentStream.getTracks().forEach(track => track.stop());
 
                 stopButton.disabled = true;
                 saveButton.disabled = false;
@@ -157,6 +172,11 @@
 
                 saveButton.disabled = true;
                 startButton.disabled = false;
+            });
+
+            flipButton.addEventListener('click', async () => {
+                useFrontCamera = !useFrontCamera;
+                await startCamera();
             });
 
             function updateBatteryStatus(battery) {

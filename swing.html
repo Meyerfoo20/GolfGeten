@@ -184,34 +184,36 @@
                 recordButton.classList.remove('btn-danger');
                 recordButton.classList.add('btn-success');
 
-                const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                const videoUrl = URL.createObjectURL(videoBlob);
+                mediaRecorder.onstop = () => {
+                    const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoUrl = URL.createObjectURL(videoBlob);
 
-                if (confirm("Vill du spara videon?")) {
-                    const videoItem = document.createElement('div');
-                    videoItem.className = 'video-item';
-                    videoItem.innerHTML = `
-                        <video controls class="video-body">
-                            <source src="${videoUrl}" type="video/webm">
-                        </video>
-                        <button class="slow-motion">Slow Motion</button>
-                    `;
-                    videoFeed.appendChild(videoItem);
+                    if (confirm("Vill du spara videon?")) {
+                        const videoItem = document.createElement('div');
+                        videoItem.className = 'video-item';
+                        videoItem.innerHTML = `
+                            <video controls class="video-body">
+                                <source src="${videoUrl}" type="video/webm">
+                            </video>
+                            <button class="slow-motion">Slow Motion</button>
+                        `;
+                        videoFeed.appendChild(videoItem);
 
-                    const slowMotionButton = videoItem.querySelector('.slow-motion');
-                    const videoElement = videoItem.querySelector('video');
-                    slowMotionButton.addEventListener('click', () => {
-                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
-                        slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
-                    });
-                }
+                        const slowMotionButton = videoItem.querySelector('.slow-motion');
+                        const videoElement = videoItem.querySelector('video');
+                        slowMotionButton.addEventListener('click', () => {
+                            videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
+                            slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                        });
+                    }
 
-                recordedChunks = [];
+                    recordedChunks = [];
 
-                cooldown = true;
-                setTimeout(() => {
-                    cooldown = false;
-                }, 3000); // 3 seconds cooldown
+                    cooldown = true;
+                    setTimeout(() => {
+                        cooldown = false;
+                    }, 3000); // 3 seconds cooldown
+                };
             }
 
             flipButton.addEventListener('click', async () => {
@@ -242,7 +244,7 @@
                     const slowMotionButton = videoItem.querySelector('.slow-motion');
                     const videoElement = videoItem.querySelector('video');
                     slowMotionButton.addEventListener('click', () => {
-                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
+                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.2 : 1;
                         slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
                     });
                 }

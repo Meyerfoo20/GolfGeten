@@ -114,11 +114,12 @@
     <main class="container">
         <section class="video-container">
             <h2>Filma din Swing</h2>
-            <video id="swingVideo" controls></video>
+            <video id="swingVideo" controls autoplay muted></video>
             <br>
             <button id="recordVideo" class="btn btn-success"><i class="fas fa-video"></i> Filma</button>
             <input type="file" id="uploadVideo" accept="video/*" style="display: none;">
             <button id="selectFromGallery" class="btn btn-primary"><i class="fas fa-folder-open"></i> Välj från Galleri</button>
+            <button id="flipCamera" class="btn btn-secondary"><i class="fas fa-sync"></i> Byt Kamera</button>
         </section>
         
         <section class="video-feed" id="videoFeed">
@@ -132,72 +133,91 @@
             const recordButton = document.getElementById('recordVideo');
             const selectButton = document.getElementById('selectFromGallery');
             const uploadInput = document.getElementById('uploadVideo');
+            const flipButton = document.getElementById('flipCamera');
             const swingVideo = document.getElementById('swingVideo');
             const videoFeed = document.getElementById('videoFeed');
 
             let mediaRecorder;
             let recordedChunks = [];
             let currentStream;
+            let useFrontCamera = false; // Start with the rear camera
+            let isRecording = false;
+            let cooldown = false;
 
-            recordButton.addEventListener('click', async () => {
+            async function startCamera() {
                 if (currentStream) {
                     currentStream.getTracks().forEach(track => track.stop());
                 }
-                const constraints = { video: true };
+                const constraints = {
+                    video: { facingMode: useFrontCamera ? 'user' : 'environment' }
+                };
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 swingVideo.srcObject = currentStream;
                 swingVideo.play();
+            }
 
-                recordedChunks = [];
+            recordButton.addEventListener('click', () => {
+                if (cooldown) return;
 
-                mediaRecorder = new MediaRecorder(currentStream);
-                mediaRecorder.ondataavailable = event => {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
-                };
-                mediaRecorder.start();
-
-                recordButton.textContent = "Stoppa";
-                recordButton.classList.remove('btn-success');
-                recordButton.classList.add('btn-danger');
-
-                recordButton.onclick = stopRecording;
+                if (isRecording) {
+                    mediaRecorder.stop();
+                    isRecording = false;
+                    handleStopRecording();
+                } else {
+                    recordedChunks = [];
+                    mediaRecorder = new MediaRecorder(currentStream);
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            recordedChunks.push(event.data);
+                        }
+                    };
+                    mediaRecorder.start();
+                    isRecording = true;
+                    recordButton.textContent = "Stoppa";
+                    recordButton.classList.remove('btn-success');
+                    recordButton.classList.add('btn-danger');
+                }
             });
 
-            function stopRecording() {
-                mediaRecorder.stop();
-                currentStream.getTracks().forEach(track => track.stop());
-
-                const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                const videoUrl = URL.createObjectURL(videoBlob);
-
-                const videoItem = document.createElement('div');
-                videoItem.className = 'video-item';
-                videoItem.innerHTML = `
-                    <video controls class="video-body">
-                        <source src="${videoUrl}" type="video/webm">
-                    </video>
-                    <button class="slow-motion">Slow Motion</button>
-                `;
-
-                videoFeed.appendChild(videoItem);
-
-                const slowMotionButton = videoItem.querySelector('.slow-motion');
-                const videoElement = videoItem.querySelector('video');
-                slowMotionButton.addEventListener('click', () => {
-                    videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
-                    slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
-                });
-
-                recordedChunks = [];
-
+            function handleStopRecording() {
                 recordButton.textContent = "Filma";
                 recordButton.classList.remove('btn-danger');
                 recordButton.classList.add('btn-success');
 
-                recordButton.onclick = recordVideo;
+                const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                const videoUrl = URL.createObjectURL(videoBlob);
+
+                if (confirm("Vill du spara videon?")) {
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    videoItem.innerHTML = `
+                        <video controls class="video-body">
+                            <source src="${videoUrl}" type="video/webm">
+                        </video>
+                        <button class="slow-motion">Slow Motion</button>
+                    `;
+                    videoFeed.appendChild(videoItem);
+
+                    const slowMotionButton = videoItem.querySelector('.slow-motion');
+                    const videoElement = videoItem.querySelector('video');
+                    slowMotionButton.addEventListener('click', () => {
+                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
+                        slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                    });
+                }
+
+                recordedChunks = [];
+
+                cooldown = true;
+                setTimeout(() => {
+                    cooldown = false;
+                }, 3000); // 3 seconds cooldown
             }
+
+            flipButton.addEventListener('click', async () => {
+                useFrontCamera = !useFrontCamera;
+                await startCamera();
+            });
 
             selectButton.addEventListener('click', () => {
                 uploadInput.click();
@@ -227,6 +247,9 @@
                     });
                 }
             });
+
+            // Start the camera when the page loads
+            startCamera();
         });
     </script>
 </body>

@@ -116,10 +116,9 @@
             <h2>Filma din Swing</h2>
             <video id="swingVideo" controls></video>
             <br>
-            <button id="startRecording" class="btn btn-success">Starta Inspelning</button>
-            <button id="stopRecording" class="btn btn-danger" disabled>Stoppa Inspelning</button>
-            <button id="saveVideo" class="btn btn-primary" disabled>Spara Video</button>
-            <button id="flipCamera" class="btn btn-secondary">Byt Kamera</button>
+            <button id="recordVideo" class="btn btn-success"><i class="fas fa-video"></i> Filma</button>
+            <input type="file" id="uploadVideo" accept="video/*" style="display: none;">
+            <button id="selectFromGallery" class="btn btn-primary"><i class="fas fa-folder-open"></i> Välj från Galleri</button>
         </section>
         
         <section class="video-feed" id="videoFeed">
@@ -130,32 +129,25 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const startButton = document.getElementById('startRecording');
-            const stopButton = document.getElementById('stopRecording');
-            const saveButton = document.getElementById('saveVideo');
-            const flipButton = document.getElementById('flipCamera');
+            const recordButton = document.getElementById('recordVideo');
+            const selectButton = document.getElementById('selectFromGallery');
+            const uploadInput = document.getElementById('uploadVideo');
             const swingVideo = document.getElementById('swingVideo');
             const videoFeed = document.getElementById('videoFeed');
 
             let mediaRecorder;
             let recordedChunks = [];
             let currentStream;
-            let useFrontCamera = true;
 
-            async function startCamera() {
+            recordButton.addEventListener('click', async () => {
                 if (currentStream) {
                     currentStream.getTracks().forEach(track => track.stop());
                 }
-                const constraints = {
-                    video: { facingMode: useFrontCamera ? 'user' : 'environment' }
-                };
+                const constraints = { video: true };
                 currentStream = await navigator.mediaDevices.getUserMedia(constraints);
                 swingVideo.srcObject = currentStream;
                 swingVideo.play();
-            }
 
-            startButton.addEventListener('click', async () => {
-                await startCamera();
                 recordedChunks = [];
 
                 mediaRecorder = new MediaRecorder(currentStream);
@@ -166,20 +158,17 @@
                 };
                 mediaRecorder.start();
 
-                startButton.disabled = true;
-                stopButton.disabled = false;
-                saveButton.disabled = true;
+                recordButton.textContent = "Stoppa";
+                recordButton.classList.remove('btn-success');
+                recordButton.classList.add('btn-danger');
+
+                recordButton.onclick = stopRecording;
             });
 
-            stopButton.addEventListener('click', () => {
+            function stopRecording() {
                 mediaRecorder.stop();
                 currentStream.getTracks().forEach(track => track.stop());
 
-                stopButton.disabled = true;
-                saveButton.disabled = false;
-            });
-
-            saveButton.addEventListener('click', () => {
                 const videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
                 const videoUrl = URL.createObjectURL(videoBlob);
 
@@ -203,52 +192,41 @@
 
                 recordedChunks = [];
 
-                saveButton.disabled = true;
-                startButton.disabled = false;
-            });
+                recordButton.textContent = "Filma";
+                recordButton.classList.remove('btn-danger');
+                recordButton.classList.add('btn-success');
 
-            flipButton.addEventListener('click', async () => {
-                useFrontCamera = !useFrontCamera;
-                await startCamera();
-            });
-
-            function updateBatteryStatus(battery) {
-                const batteryIcon = document.getElementById('battery-icon');
-                let level = battery.level * 100;
-
-                if (level > 75) {
-                    batteryIcon.className = 'fas fa-battery-full';
-                } else if (level > 50) {
-                    batteryIcon.className = 'fas fa-battery-three-quarters';
-                } else if (level > 25) {
-                    batteryIcon.className = 'fas fa-battery-half';
-                } else if (level > 10) {
-                    batteryIcon.className = 'fas fa-battery-quarter';
-                } else {
-                    batteryIcon.className = 'fas fa-battery-empty';
-                }
+                recordButton.onclick = recordVideo;
             }
 
-            navigator.getBattery().then(function(battery) {
-                updateBatteryStatus(battery);
-
-                battery.addEventListener('levelchange', function() {
-                    updateBatteryStatus(battery);
-                });
+            selectButton.addEventListener('click', () => {
+                uploadInput.click();
             });
 
-            function updateWifiStatus() {
-                const wifiIcon = document.getElementById('wifi-icon');
-                if (navigator.onLine) {
-                    wifiIcon.className = 'fas fa-wifi';
-                } else {
-                    wifiIcon.className = 'fas fa-wifi-slash';
-                }
-            }
+            uploadInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const videoUrl = URL.createObjectURL(file);
 
-            updateWifiStatus();
-            window.addEventListener('online', updateWifiStatus);
-            window.addEventListener('offline', updateWifiStatus);
+                    const videoItem = document.createElement('div');
+                    videoItem.className = 'video-item';
+                    videoItem.innerHTML = `
+                        <video controls class="video-body">
+                            <source src="${videoUrl}" type="video/${file.type.split('/')[1]}">
+                        </video>
+                        <button class="slow-motion">Slow Motion</button>
+                    `;
+
+                    videoFeed.appendChild(videoItem);
+
+                    const slowMotionButton = videoItem.querySelector('.slow-motion');
+                    const videoElement = videoItem.querySelector('video');
+                    slowMotionButton.addEventListener('click', () => {
+                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
+                        slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                    });
+                }
+            });
         });
     </script>
 </body>

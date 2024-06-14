@@ -88,6 +88,10 @@
         .video-feed .video-item .slow-motion:hover {
             background-color: rgba(0, 77, 0, 0.9);
         }
+
+        .video-body {
+            box-shadow: 0 8px 16px rgba(0, 155, 21, 0.5);
+        }
     </style>
 </head>
 <body>
@@ -182,7 +186,7 @@
                 const videoItem = document.createElement('div');
                 videoItem.className = 'video-item';
                 videoItem.innerHTML = `
-                    <video controls>
+                    <video controls class="video-body">
                         <source src="${videoUrl}" type="video/webm">
                     </video>
                     <button class="slow-motion">Slow Motion</button>

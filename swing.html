@@ -6,6 +6,7 @@
     <title>GolfGeten - Swing</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="icon" href="logo.png" type="image/png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,10 +74,10 @@
             border-radius: 5px;
         }
 
-        .video-feed .video-item .slow-motion {
+        .video-feed .video-item .slow-motion,
+        .video-feed .video-item .delete-video {
             position: absolute;
             top: 10px;
-            right: 10px;
             background-color: rgba(0, 77, 0, 0.7);
             color: white;
             border: none;
@@ -85,8 +86,21 @@
             cursor: pointer;
         }
 
+        .video-feed .video-item .slow-motion {
+            right: 10px;
+        }
+
+        .video-feed .video-item .delete-video {
+            right: 90px;
+            background-color: rgba(255, 0, 0, 0.7);
+        }
+
         .video-feed .video-item .slow-motion:hover {
             background-color: rgba(0, 77, 0, 0.9);
+        }
+
+        .video-feed .video-item .delete-video:hover {
+            background-color: rgba(255, 0, 0, 0.9);
         }
 
         .video-body {
@@ -143,6 +157,7 @@
             let useFrontCamera = false; // Start with the rear camera
             let isRecording = false;
             let cooldown = false;
+            const maxRecordingTime = 30000; // 30 seconds
 
             async function startCamera() {
                 if (currentStream) {
@@ -176,6 +191,14 @@
                     recordButton.textContent = "Stoppa";
                     recordButton.classList.remove('btn-success');
                     recordButton.classList.add('btn-danger');
+
+                    setTimeout(() => {
+                        if (isRecording) {
+                            mediaRecorder.stop();
+                            isRecording = false;
+                            handleStopRecording();
+                        }
+                    }, maxRecordingTime);
                 }
             });
 
@@ -196,14 +219,19 @@
                                 <source src="${videoUrl}" type="video/webm">
                             </video>
                             <button class="slow-motion">Slow Motion</button>
+                            <button class="delete-video">Ta bort</button>
                         `;
                         videoFeed.appendChild(videoItem);
 
                         const slowMotionButton = videoItem.querySelector('.slow-motion');
+                        const deleteButton = videoItem.querySelector('.delete-video');
                         const videoElement = videoItem.querySelector('video');
                         slowMotionButton.addEventListener('click', () => {
                             videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
                             slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                        });
+                        deleteButton.addEventListener('click', () => {
+                            videoItem.remove
                         });
                     }
 
@@ -212,7 +240,7 @@
                     cooldown = true;
                     setTimeout(() => {
                         cooldown = false;
-                    }, 3000); // 3 seconds cooldown
+                    }, 5000); // 5 seconds cooldown
                 };
             }
 
@@ -221,12 +249,14 @@
                 await startCamera();
             });
 
+            // Show upload dialog when select from gallery button is clicked
             selectButton.addEventListener('click', () => {
                 uploadInput.click();
             });
 
-            uploadInput.addEventListener('change', (event) => {
-                const file = event.target.files[0];
+            // Handle file selection from gallery
+            uploadInput.addEventListener('change', () => {
+                const file = uploadInput.files[0];
                 if (file) {
                     const videoUrl = URL.createObjectURL(file);
 
@@ -234,24 +264,60 @@
                     videoItem.className = 'video-item';
                     videoItem.innerHTML = `
                         <video controls class="video-body">
-                            <source src="${videoUrl}" type="video/${file.type.split('/')[1]}">
+                            <source src="${videoUrl}" type="${file.type}">
                         </video>
-                        <button class="slow-motion">Slow Motion</button>
+                        <button class="delete-video">Ta bort</button>
                     `;
-
                     videoFeed.appendChild(videoItem);
 
-                    const slowMotionButton = videoItem.querySelector('.slow-motion');
-                    const videoElement = videoItem.querySelector('video');
-                    slowMotionButton.addEventListener('click', () => {
-                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.2 : 1;
-                        slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                    const deleteButton = videoItem.querySelector('.delete-video');
+                    deleteButton.addEventListener('click', () => {
+                        videoItem.remove();
                     });
                 }
             });
 
-            // Start the camera when the page loads
-            startCamera();
+            // Function to update battery status
+            function updateBatteryStatus(battery) {
+                const batteryIcon = document.getElementById('battery-icon');
+                let level = battery.level * 100;
+
+                if (level > 75) {
+                    batteryIcon.className = 'fas fa-battery-full';
+                } else if (level > 50) {
+                    batteryIcon.className = 'fas fa-battery-three-quarters';
+                } else if (level > 25) {
+                    batteryIcon.className = 'fas fa-battery-half';
+                } else if (level > 10) {
+                    batteryIcon.className = 'fas fa-battery-quarter';
+                } else {
+                    batteryIcon.className = 'fas fa-battery-empty';
+                }
+            }
+
+            // Update battery status on initial load and on level change
+            navigator.getBattery().then(function(battery) {
+                updateBatteryStatus(battery);
+
+                battery.addEventListener('levelchange', function() {
+                    updateBatteryStatus(battery);
+                });
+            });
+
+            // Function to update WiFi status
+            function updateWifiStatus() {
+                const wifiIcon = document.getElementById('wifi-icon');
+                if (navigator.onLine) {
+                    wifiIcon.className = 'fas fa-wifi';
+                } else {
+                    wifiIcon.className = 'fas fa-wifi-slash';
+                }
+            }
+
+            // Update WiFi status on initial load and when online/offline status changes
+            updateWifiStatus();
+            window.addEventListener('online', updateWifiStatus);
+            window.addEventListener('offline', updateWifiStatus);
         });
     </script>
 </body>

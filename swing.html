@@ -235,7 +235,7 @@
                             slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
                         });
                         deleteButton.addEventListener('click', () => {
-                            videoItem.remove
+                            videoItem.remove();
                         });
                     }
 
@@ -270,11 +270,18 @@
                         <video controls class="video-body">
                             <source src="${videoUrl}" type="${file.type}">
                         </video>
+                        <button class="slow-motion">Slow Motion</button>
                         <button class="delete-video">Ta bort</button>
                     `;
                     videoFeed.appendChild(videoItem);
 
+                    const slowMotionButton = videoItem.querySelector('.slow-motion');
                     const deleteButton = videoItem.querySelector('.delete-video');
+                    const videoElement = videoItem.querySelector('video');
+                    slowMotionButton.addEventListener('click', () => {
+                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.1 : 1;
+                        slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
+                    });
                     deleteButton.addEventListener('click', () => {
                         videoItem.remove();
                     });
@@ -322,6 +329,9 @@
             updateWifiStatus();
             window.addEventListener('online', updateWifiStatus);
             window.addEventListener('offline', updateWifiStatus);
+
+            // Start the camera initially
+            startCamera();
         });
     </script>
 </body>

@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golf Scorecard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #e0f7e9;
+            color: #333;
+        }
+        .scroll-container {
+            overflow-x: scroll;
+            white-space: nowrap;
+            margin-bottom: 20px;
+        }
+        .hole-button {
+            display: inline-block;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: 1px solid #388e3c;
+            border-radius: 10px 10px 0px 0px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        .hole-button:hover {
+            background-color: #45a049;
+        }
+        .hole-info {
+            background-color: #388e3c;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .total-stats {
+            background-color: #66bb6a;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .hcp-input {
+            margin-bottom: 10px;
+        }
+        label {
+            font-weight: bold;
+        }
+        .player-container {
+            margin-bottom: 20px;
+        }
+        .player-scorecard {
+            margin-top: 20px;
+        }
+        .save-load-container {
+            margin-top: 20px;
+        }
+        .save-load-btn {
+            padding: 10px;
+            background-color: #53c258;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .save-load-btn:hover {
+            background-color: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scorecard CC</h1>
+
+    <div style="margin-bottom: 40px;">
+        <label for="num-players">Antal spelare:</label>
+        <input type="number" id="num-players" min="1" max="4" value="1">
+        <button onclick="createScorecards()">Skapa scorecard</button>
+    </div>
+
+    <div class="scroll-container" id="scroll-container">
+        <!-- Dynamiskt genererade knappar för hål kommer att placeras här -->
+    </div>
+
+    <div id="player-container" class="player-container">
+        <!-- Scorecards för spelare kommer att placeras här -->
+    </div>
+
+    <div class="total-stats" id="total-stats">
+        <!-- Total statistik för varje spelare kommer att visas här -->
+    </div>
+
+    <div class="save-load-container">
+        <button class="save-load-btn" onclick="resetData()" style="border-radius: 20px;">Återställ data</button>
+    </div>
+
+    <script>
+        var savedData = localStorage.getItem('golfScorecardData') ? JSON.parse(localStorage.getItem('golfScorecardData')) : {};
+
+        // Funktion för att beräkna poängen för ett hål enligt golfreglerna
+        function calculatePoints(hcp, par, index, shots) {
+            if (isNaN(shots)) return 0;
+            var netto = shots - Math.floor(hcp / 18) - (index <= hcp % 18 ? 1 : 0);
+            var points = 0;
+
+            if (netto <= par - 2) {
+                points = 4;
+            } else if (netto === par - 1) {
+                points = 3;
+            } else if (netto === par) {
+                points = 2;
+            } else if (netto === par + 1) {
+                points = 1;
+            } else if (netto >= par + 2) {
+                points = 0;
+            }
+
+            return points;
+        }
+
+        // Skapa en lista med hålinformation för 18 hål
+        var holes = [
+            { num: 1, par: 5, index: 12 },
+            { num: 2, par: 4, index: 4 },
+            { num: 3, par: 4, index: 16 },
+            { num: 4, par: 3, index: 18 },
+            { num: 5, par: 5, index: 2 },
+            { num: 6, par: 4, index: 8 },
+            { num: 7, par: 3, index: 10 },
+            { num: 8, par: 4, index: 14 },
+            { num: 9, par: 4, index: 6 },
+            { num: 10, par: 4, index: 5 },
+            { num: 11, par: 5, index: 11 },
+            { num: 12, par: 4, index: 1 },
+            { num: 13, par: 4, index: 15 },
+            { num: 14, par: 3, index: 13 },
+            { num: 15, par: 4, index: 3 },
+            { num: 16, par: 4, index: 7 },
+            { num: 17, par: 3, index: 17 },
+            { num: 18, par: 5, index: 9 }
+        ];
+
+        var numPlayers = 1;
+        var playerContainer = document.getElementById('player-container');
+        var scrollContainer = document.getElementById('scroll-container');
+        var totalStatsContainer = document.getElementById('total-stats');
+
+        var scores = {};
+
+        // Funktion för att skapa scorecards för spelare
+        function createScorecards() {
+            numPlayers = parseInt(document.getElementById('num-players').value);
+            playerContainer.innerHTML = '';
+            totalStatsContainer.innerHTML = '';
+            scores = savedData.scores || {};
+
+            for (var i = 1; i <= numPlayers; i++) {
+                var playerName = savedData.players && savedData.players[i] ? savedData.players[i] : 'Spelare ' + i;
+                var hcp = savedData.hcps && savedData.hcps[i] ? savedData.hcps[i] : 0;
+
+                var playerScorecard = document.createElement('div');
+                playerScorecard.className = 'player-scorecard';
+                playerScorecard.id = 'player-scorecard-' + i;
+                playerScorecard.innerHTML = `
+                    <h2>Spelare ${i}</h2>
+                    <label for="player-name-${i}">Namn:</label>
+                    <input type="text" id="player-name-${i}" class="player-name-input" value="${playerName}">
+                    <label for="hcp-${i}">HCP:</label>
+                    <input type="number" id="hcp-${i}" class="hcp-input" min="0" value="${hcp}">
+                    <div class="hole-info" id="hole-info-${i}">
+                        <!-- Information om det valda hålet kommer att visas här -->
+                    </div>
+                    <div class="player-stats" id="player-stats-${i}">
+                        <!-- Total statistik för spelaren kommer att visas här -->
+                    </div>
+                `;
+                playerContainer.appendChild(playerScorecard);
+
+                document.getElementById('hcp-' + i).addEventListener('change', function() {
+                    updatePoints();
+                });
+            }
+
+            updatePoints();
+        }
+
+        // Funktion för att uppdatera poängen för alla hål baserat på det nuvarande HCP
+        function updatePoints() {
+            var totalStatsHTML = '';
+            var playersData = { players: {}, hcps: {}, scores: {} };
+
+            for (var i = 1; i <= numPlayers; i++) {
+                var playerName = document.getElementById('player-name-' + i).value || 'Spelare ' + i;
+                var hcp = parseInt(document.getElementById('hcp-' + i).value) || 0;
+
+                playersData.players[i] = playerName;
+                playersData.hcps[i] = hcp;
+                playersData.scores[i] = {};
+
+                var totalPoints = 0;
+                var totalBrutto = 0;
+                var totalNetto = 0;
+
+                holes.forEach(function(hole) {
+                    var shots = scores[i] && scores[i][hole.num] ? scores[i][hole.num].shots : NaN;
+                    var points = calculatePoints(hcp, hole.par, hole.index, shots);
+                    if (!isNaN(shots)) {
+                        playersData.scores[i][hole.num] = { shots: shots, points: points };
+
+                        totalPoints += points;
+                        totalBrutto += shots;
+                        totalNetto += shots - Math.floor(hcp / 18) - (hole.index <= hcp % 18 ? 1 : 0);
+                    }
+                });
+
+                totalStatsHTML += `
+                    <div class="player-stats">
+                        <h2>${playerName}</h2>
+                        <p>Totala poäng: ${totalPoints}</p>
+                        <p>Brutto: ${totalBrutto}</p>
+                        <p>Netto: ${totalNetto}</p>
+                    </div>
+                `;
+            }
+
+            totalStatsContainer.innerHTML = totalStatsHTML;
+
+            // Spara data till localStorage
+            localStorage.setItem('golfScorecardData', JSON.stringify(playersData));
+        }
+
+        // Funktion för att visa information om ett hål för en specifik spelare
+        function showHoleInfo(player, hole) {
+            var shotsValue = scores[player] && scores[player][hole.num] ? scores[player][hole.num].shots : '';
+            var holeInfo = document.getElementById('hole-info-' + player);
+            holeInfo.innerHTML = `
+                <h2>Hål ${hole.num}</h2>
+                <p>Par: ${hole.par}</p>
+                <p>Index: ${hole.index}</p>
+                <label for="shots-${player}-${hole.num}">Slag:</label>
+                <input type="number" id="shots-${player}-${hole.num}" min="1" value="${shotsValue}">
+                <p>Poäng: <span id="points-${player}-${hole.num}">${scores[player] && scores[player][hole.num] ? scores[player][hole.num].points : 0}</span></p>
+            `;
+
+            document.getElementById(`shots-${player}-${hole.num}`).addEventListener('change', function() {
+                var shots = parseInt(this.value);
+                var points = calculatePoints(parseInt(document.getElementById('hcp-' + player).value), hole.par, hole.index, shots);
+                if (!scores[player]) scores[player] = {};
+                scores[player][hole.num] = { shots: shots, points: points };
+                document.getElementById(`points-${player}-${hole.num}`).textContent = points;
+
+                updatePoints();
+            });
+
+            updatePoints();
+        }
+
+        // Skapa knappar för att välja hål
+        holes.forEach(function(hole) {
+            var button = document.createElement('div');
+            button.textContent = `Hål ${hole.num}`;
+            button.className = 'hole-button';
+            button.addEventListener('click', function() {
+                for (var i = 1; i <= numPlayers; i++) {
+                    showHoleInfo(i, hole);
+                }
+            });
+            scrollContainer.appendChild(button);
+        });
+
+        // Funktion för att spara data till localStorage
+        function saveData() {
+            localStorage.setItem('golfScorecardData', JSON.stringify({
+                players: savedData.players,
+                hcps: savedData.hcps,
+                scores: scores
+            }));
+            alert('Data har sparats.');
+        }
+
+        // Funktion för att ladda data från localStorage
+        function loadData() {
+            var data = JSON.parse(localStorage.getItem('golfScorecardData'));
+            if (data) {
+                savedData = data;
+                createScorecards();
+                updatePoints();
+                alert('Data har laddats.');
+            } else {
+                alert('Ingen sparad data hittades.');
+            }
+        }
+
+        // Funktion för att återställa all sparad data
+        function resetData() {
+            localStorage.removeItem('golfScorecardData'); // Remove saved data from localStorage
+            savedData = {}; // Clear savedData object
+
+            // Recreate scorecards with default values
+            createScorecards();
+            updatePoints();
+
+            alert('All data har återställts.');
+        }
+
+
+        // Skapa scorecards när sidan laddas
+        createScorecards();
+    </script>
+</body>
+</html>

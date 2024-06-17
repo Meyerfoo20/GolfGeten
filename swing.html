@@ -76,8 +76,16 @@
             border-radius: 5px;
         }
 
+        .video-feed .video-item canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
         .video-feed .video-item .slow-motion,
-        .video-feed .video-item .delete-video {
+        .video-feed .video-item .delete-video,
+        .video-feed .video-item .draw-video {
             position: absolute;
             top: 10px;
             background-color: rgba(0, 77, 0, 0.7);
@@ -86,6 +94,7 @@
             border-radius: 5px;
             padding: 5px 10px;
             cursor: pointer;
+            margin-right: 5px;
         }
 
         .video-feed .video-item .slow-motion {
@@ -97,12 +106,21 @@
             background-color: rgba(255, 0, 0, 0.7);
         }
 
+        .video-feed .video-item .draw-video {
+            right: 170px;
+            background-color: rgba(0, 0, 255, 0.7);
+        }
+
         .video-feed .video-item .slow-motion:hover {
             background-color: rgba(0, 77, 0, 0.9);
         }
 
         .video-feed .video-item .delete-video:hover {
             background-color: rgba(255, 0, 0, 0.9);
+        }
+
+        .video-feed .video-item .draw-video:hover {
+            background-color: rgba(0, 0, 255, 0.9);
         }
 
         .video-body {
@@ -224,18 +242,56 @@
                             <video controls class="video-body">
                                 <source src="${videoUrl}" type="video/webm">
                             </video>
+                            <canvas></canvas>
                             <button class="slow-motion">Slow Motion</button>
                             <button class="delete-video">Ta bort</button>
+                            <button class="draw-video">Rita</button>
                         `;
                         videoFeed.appendChild(videoItem);
 
                         const slowMotionButton = videoItem.querySelector('.slow-motion');
                         const deleteButton = videoItem.querySelector('.delete-video');
+                        const drawButton = videoItem.querySelector('.draw-video');
                         const videoElement = videoItem.querySelector('video');
+                        const canvas = videoItem.querySelector('canvas');
+                        const context = canvas.getContext('2d');
+
+                        canvas.width = videoElement.clientWidth;
+                        canvas.height = videoElement.clientHeight;
+
+                        let drawing = false;
+
+                        canvas.addEventListener('mousedown', (e) => {
+                            drawing = true;
+                            context.beginPath();
+                            context.moveTo(e.offsetX, e.offsetY);
+                        });
+
+                        canvas.addEventListener('mousemove', (e) => {
+                            if (drawing) {
+                                context.lineTo(e.offsetX, e.offsetY);
+                                context.stroke();
+                            }
+                        });
+
+                        canvas.addEventListener('mouseup', () => {
+                            drawing = false;
+                        });
+
+                        canvas.addEventListener('mouseout', () => {
+                            drawing = false;
+                        });
+
+                        drawButton.addEventListener('click', () => {
+                            canvas.style.pointerEvents = canvas.style.pointerEvents === 'none' ? 'auto' : 'none';
+                            drawButton.textContent = canvas.style.pointerEvents === 'none' ? 'Rita' : 'Sluta rita';
+                        });
+
                         slowMotionButton.addEventListener('click', () => {
                             videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
                             slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
                         });
+
                         deleteButton.addEventListener('click', () => {
                             videoItem.remove();
                         });
@@ -272,18 +328,56 @@
                         <video controls class="video-body">
                             <source src="${videoUrl}" type="${file.type}">
                         </video>
+                        <canvas></canvas>
                         <button class="slow-motion">Slow Motion</button>
                         <button class="delete-video">Ta bort</button>
+                        <button class="draw-video">Rita</button>
                     `;
                     videoFeed.appendChild(videoItem);
 
                     const slowMotionButton = videoItem.querySelector('.slow-motion');
                     const deleteButton = videoItem.querySelector('.delete-video');
+                    const drawButton = videoItem.querySelector('.draw-video');
                     const videoElement = videoItem.querySelector('video');
+                    const canvas = videoItem.querySelector('canvas');
+                    const context = canvas.getContext('2d');
+
+                    canvas.width = videoElement.clientWidth;
+                    canvas.height = videoElement.clientHeight;
+
+                    let drawing = false;
+
+                    canvas.addEventListener('mousedown', (e) => {
+                        drawing = true;
+                        context.beginPath();
+                        context.moveTo(e.offsetX, e.offsetY);
+                    });
+
+                    canvas.addEventListener('mousemove', (e) => {
+                        if (drawing) {
+                            context.lineTo(e.offsetX, e.offsetY);
+                            context.stroke();
+                        }
+                    });
+
+                    canvas.addEventListener('mouseup', () => {
+                        drawing = false;
+                    });
+
+                    canvas.addEventListener('mouseout', () => {
+                        drawing = false;
+                    });
+
+                    drawButton.addEventListener('click', () => {
+                        canvas.style.pointerEvents = canvas.style.pointerEvents === 'none' ? 'auto' : 'none';
+                        drawButton.textContent = canvas.style.pointerEvents === 'none' ? 'Rita' : 'Sluta rita';
+                    });
+
                     slowMotionButton.addEventListener('click', () => {
-                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.1 : 1;
+                        videoElement.playbackRate = videoElement.playbackRate === 1 ? 0.5 : 1;
                         slowMotionButton.textContent = videoElement.playbackRate === 1 ? 'Slow Motion' : 'Normal Speed';
                     });
+
                     deleteButton.addEventListener('click', () => {
                         videoItem.remove();
                     });
